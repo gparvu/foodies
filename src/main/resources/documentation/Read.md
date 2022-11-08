@@ -1,0 +1,1 @@
+to run the application use mvn spring-boot:run

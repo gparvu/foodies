@@ -1,0 +1,215 @@
+openapi: 3.0.3
+info:
+  title: Foodies
+  version: 1.0.0
+  description: |-
+    Technical assignment for a service which allows users to manage their favourite recipes. It allows adding, updating, removing and fetching recipes. Additionally users are be able to filter on available recipes based on one or more criterias.
+    - Whether or not the dish is vegetarian
+    - The number of servings
+    - Specific ingredients (either include or exclude)
+    - Text search within the instructions
+
+    For example, the API is able to handle the following search requests
+    - All vegetarian recipes
+    - Recipes that can serve 4 persons and have “potatoes” as an ingredient
+    - Recipes without “salmon” as an ingredient that has “oven” in the instructions.
+
+
+  termsOfService: TODO README LINK
+  contact:
+    email: georgian.parvu@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+
+servers:
+  - url: https://nl.abn.foodies
+tags:
+  - name: recipes
+    description: Operations for handling recipes
+paths:
+  /recipes:
+    put:
+      tags:
+        - recipes
+      summary: Update an existing recipe
+      description: Update an existing recipe by Id. Id will be used from the body. This will be a full update of the recipe
+      requestBody:
+        description: Update an existent recipe
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '404':
+          description: recipe not found
+
+
+    post:
+      tags:
+        - recipes
+      summary: Add a new recipe
+      requestBody:
+        description: Create a new recipe
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+
+    get:
+      tags:
+        - recipes
+      summary: Finds recipes by type (vegan, paleo, vegetarian, carnivorous)
+      description: Multiple dish type values can be provided with comma separated strings
+      parameters:
+        - name: types
+          in: query
+          description: Dish type values  that need to be considered for filter
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: noOfServings
+          in: query
+          description: How many number of servings to filter for
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: withIngredients
+          in: query
+          description: ingredients used in recipe
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: mentioning
+          in: query
+          description: keywords that should appear in recipe's description
+          required: false
+          explode: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Invalid status value
+
+  /recipe/{recipeId}:
+    get:
+      tags:
+        - recipes
+      summary: Find recipe by ID
+      description: Returns a single recipe
+      parameters:
+        - name: recipeId
+          in: path
+          description: ID of recipe to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '404':
+          description: recipe not found
+
+    delete:
+      tags:
+        - recipes
+      summary: Deletes a recipe
+      description: delete a recipe
+      parameters:
+        - name: api_key
+          in: header
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: recipeId
+          in: path
+          description: recipe id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Ok
+
+
+
+components:
+  schemas:
+    Recipe:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: Avo Toast
+        noOfServings:
+          type: integer
+          format: int64
+          example: 2
+        type:
+          type: string
+          example: Vegan
+        ingredients:
+          type: string
+          example: Vegan
+
+    Response:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  requestBodies:
+    recipe:
+      description: recipe object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Recipe'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Recipe'

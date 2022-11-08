@@ -1,0 +1,16 @@
+Spring Boot to benefit from easy setups and bindings
+
+Use Contract-First approach for easier collaboration between teams and also to leverage code gen tools. Contracts are our entry points so should be given the needed attention
+
+Open API 3 -> widely accepted standard and addapted to be more inclusive of Links ( complete Restfull services) , Oauth2 and OpenID Connect Discovery ( microservices)
+OpenAPI 3.1 -> still needs some time to have a mature ecosystem around it
+
+For sake of simplicity we will support only on mediatype, the application/Json. Multiple types could be supported for multiple clients based on needs.
+
+JPA3 as persistance layer for maximum portability
+ManyToMany relationship for recipes and ingredients as some ingredients may belong to few recipes and to improve that search performance.
+
+Postman can be used targeting localhost:8081 for the endpoints described in foodies_api_specification.yaml
+
+
+
