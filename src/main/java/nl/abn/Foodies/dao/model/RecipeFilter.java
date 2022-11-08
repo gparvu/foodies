@@ -8,6 +8,7 @@ import java.util.Set;
 public class RecipeFilter {
 
     Set<String> ofTypes;
+    Set<String> notOfTypes;
     Integer noOfServings;
     Set<String> withIngredients;
     Set<String> mentioning;

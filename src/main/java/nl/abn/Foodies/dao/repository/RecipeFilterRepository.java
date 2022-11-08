@@ -19,7 +19,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class RecipeFilterRepository {
@@ -29,18 +31,25 @@ public class RecipeFilterRepository {
     EntityManager em;
 
 
-    public List<Recipe> findRecipesBy(RecipeFilter recipeFilter) {
+    public Set<Recipe> findRecipesBy(RecipeFilter recipeFilter) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Recipe> criteria = builder.createQuery(Recipe.class);
         Root<Recipe> rootRecipe = criteria.from(Recipe.class);
         List<Predicate> predicates = new ArrayList<>();
 
-
         if (!CollectionUtils.isEmpty(recipeFilter.getOfTypes())) {
-            Expression<Collection<String>> languages = rootRecipe.get("types");
+            Expression<Collection<String>> types = rootRecipe.get("types");
 
             for (String dishType : recipeFilter.getOfTypes()) {
-                predicates.add(builder.isMember(dishType, languages));
+                predicates.add(builder.isMember(dishType, types));
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(recipeFilter.getNotOfTypes())) {
+            Expression<Collection<String>> types = rootRecipe.get("types");
+
+            for (String dishType : recipeFilter.getNotOfTypes()) {
+                predicates.add(builder.isNotMember(dishType, types));
             }
         }
 
@@ -67,7 +76,7 @@ public class RecipeFilterRepository {
         criteria.where(builder.and(predicates.toArray(new Predicate[0])));
 
         TypedQuery<Recipe> query = em.createQuery(criteria);
-        return query.getResultList();
+        return new HashSet<>(query.getResultList());
     }
 
 

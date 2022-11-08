@@ -29,6 +29,8 @@ class FoodiesApplicationTests {
 
     public static final List<String> AVO_TOAST_DISH_TYPES = Lists.list("Vegan", "Paleo");
     public static final String AVO_TOAST = "Avo Toast";
+    public static final String SALMON_AVOCADO = "Salmon & Avocado";
+
     @Autowired
     private RecipeRepository repository;
 
@@ -44,7 +46,6 @@ class FoodiesApplicationTests {
     void saveRecipe() {
         ResponseEntity<RecipePayload> response = recipeApi.addRecipe(createAvoToastPayload());
 
-        System.out.println("================== " + response);
         assertTrue(response.hasBody());
         assertNotNull(response.getBody().getId());
         assertEquals(AVO_TOAST, response.getBody().getName());
@@ -113,7 +114,7 @@ class FoodiesApplicationTests {
     void getVeganRecipes() {
         initDbWithRecipes();
 
-        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy("Vegan", 2, null, null);
+        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy("Vegan", null, 2, null, null);
 
         assertEquals(1, response.getBody().size());
         assertEquals(1, response.getBody().get(0).getId());
@@ -123,10 +124,21 @@ class FoodiesApplicationTests {
     }
 
     @Test
+    void getNonVeganRecipes() {
+        initDbWithRecipes();
+
+        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy(null, "Vegan", null, null, null);
+
+        assertEquals(1, response.getBody().size());
+        assertEquals(SALMON_AVOCADO, response.getBody().get(0).getName());
+        assertFalse(response.getBody().get(0).getTypes().contains("Vegan"));
+    }
+
+    @Test
     void getPaleoRecipes() {
         initDbWithRecipes();
 
-        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy("Paleo", null, null, null);
+        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy("Paleo", null, null, null, null);
 
         assertEquals(2, response.getBody().size());
     }
@@ -135,7 +147,7 @@ class FoodiesApplicationTests {
     void getRecipesWithAvocado() {
         initDbWithRecipes();
 
-        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy(null, null, "Avocado", null);
+        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy(null, null, null, "Avocado", null);
 
         assertEquals(2, response.getBody().size());
     }
@@ -144,7 +156,7 @@ class FoodiesApplicationTests {
     void getRecipesWithAvocadoMentioningBake() {
         initDbWithRecipes();
 
-        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy(null, null, "Avocado", "bake");
+        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy(null, null, null, "Avocado", "bake");
 
         assertEquals(1, response.getBody().size());
         assertEquals("Avo Toast", response.getBody().get(0).getName());
@@ -154,7 +166,7 @@ class FoodiesApplicationTests {
     void getRecipesWithAvocadoAndSalmon() {
         initDbWithRecipes();
 
-        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy(null, null, "Avocado,Salmon", null);
+        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy(null, null, null, "Avocado,Salmon", null);
 
         assertEquals(1, response.getBody().size());
         assertEquals("Salmon & Avocado", response.getBody().get(0).getName());
@@ -164,7 +176,7 @@ class FoodiesApplicationTests {
     void getRecipesMentioningBake() {
         initDbWithRecipes();
 
-        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy(null, null, null, "bake");
+        ResponseEntity<List<RecipePayload>> response = recipeApi.findRecipesBy(null, null, null, null, "bake");
 
         assertEquals(1, response.getBody().size());
         assertEquals("Avo Toast", response.getBody().get(0).getName());
@@ -182,7 +194,7 @@ class FoodiesApplicationTests {
         Recipe salmonWithAvocado = new Recipe();
         salmonWithAvocado.setId(2);
         salmonWithAvocado.setNoOfServings(1L);
-        salmonWithAvocado.setName("Salmon & Avocado");
+        salmonWithAvocado.setName(SALMON_AVOCADO);
         salmonWithAvocado.setTypes(new HashSet<>(Lists.list("Carnivorous", "Paleo")));
 
         Set<Ingredient> ingredients = new HashSet<>();

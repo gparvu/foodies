@@ -75,12 +75,19 @@ paths:
     get:
       tags:
         - recipes
-      summary: Finds recipes by type (vegan, paleo, vegetarian, carnivorous)
+      summary: Finds recipes by multiple filters
       description: Multiple dish type values can be provided with comma separated strings
       parameters:
-        - name: types
+        - name: ofTypes
           in: query
-          description: Dish type values  that need to be considered for filter
+          description: Dish type values desired
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: notOfTypes
+          in: query
+          description: Dish type values not wanted
           required: false
           explode: true
           schema:
@@ -205,7 +212,7 @@ components:
           type: string
   requestBodies:
     recipe:
-      description: recipe object that needs to be added to the store
+      description: recipe object that needs to be added
       content:
         application/json:
           schema:

@@ -71,13 +71,15 @@ public class RecipeApi {
      */
     @GetMapping
     public ResponseEntity<java.util.List<RecipePayload>> findRecipesBy(
-            @RequestParam String types,
+            @RequestParam String ofTypes,
+            @RequestParam String notOfTypes,
             @RequestParam Integer noOfServings,
             @RequestParam String withIngredients,
             @RequestParam String mentioning) {
 
         RecipeFilter filter = new RecipeFilter();
-        filter.setOfTypes(StringUtils.commaDelimitedListToSet(types));
+        filter.setOfTypes(StringUtils.commaDelimitedListToSet(ofTypes));
+        filter.setNotOfTypes(StringUtils.commaDelimitedListToSet(notOfTypes));
         filter.setNoOfServings(noOfServings);
         filter.setWithIngredients(StringUtils.commaDelimitedListToSet(withIngredients));
         filter.setMentioning(StringUtils.commaDelimitedListToSet(mentioning));

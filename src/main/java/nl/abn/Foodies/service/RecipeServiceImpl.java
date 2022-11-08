@@ -37,6 +37,7 @@ public class RecipeServiceImpl implements RecipeService {
         newRecipe.setNoOfServings(recipePayload.getNoOfServings());
         newRecipe.setTypes(new HashSet<>(recipePayload.getTypes()));
         newRecipe.setIngredients(processIngredients(recipePayload.getIngredients()));
+        newRecipe.setDetails(recipePayload.getDetails());
         recipeRepository.save(newRecipe);
 
         return createRecipePayload(newRecipe);
@@ -82,7 +83,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public List<RecipePayload> findRecipesBy(RecipeFilter filter) {
-        List<Recipe> recipes = recipeFilterRepository.findRecipesBy(filter);
+        Set<Recipe> recipes = recipeFilterRepository.findRecipesBy(filter);
 
         return recipes.stream()
                 .map(RecipeServiceImpl::createRecipePayload)
@@ -107,6 +108,7 @@ public class RecipeServiceImpl implements RecipeService {
                 .types(new ArrayList<>(recipe.getTypes()))
                 .noOfServings(recipe.getNoOfServings())
                 .ingredients(createIngredientsPayload(recipe.getIngredients()))
+                .details(recipe.getDetails())
                 .build();
 
         return recipePayload;
