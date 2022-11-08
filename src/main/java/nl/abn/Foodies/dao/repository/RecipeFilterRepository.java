@@ -35,11 +35,6 @@ public class RecipeFilterRepository {
         Root<Recipe> rootRecipe = criteria.from(Recipe.class);
         List<Predicate> predicates = new ArrayList<>();
 
-        if (!CollectionUtils.isEmpty(recipeFilter.getMentioning())) {
-            for (String mention : recipeFilter.getWithIngredients()) {
-                predicates.add(builder.like(rootRecipe.get("details"), "%" + mention + "%"));
-            }
-        }
 
         if (!CollectionUtils.isEmpty(recipeFilter.getOfTypes())) {
             Expression<Collection<String>> languages = rootRecipe.get("types");
@@ -55,10 +50,16 @@ public class RecipeFilterRepository {
         }
 
         if (!CollectionUtils.isEmpty(recipeFilter.getWithIngredients())) {
-            Join<Recipe, Ingredient> recipeIngredientJoin = rootRecipe.join("ingredients", JoinType.INNER);
 
             for (String ingredient : recipeFilter.getWithIngredients()) {
-                predicates.add(builder.equal(recipeIngredientJoin.get("name"), ingredient));
+                Join<Recipe, Ingredient> recipeIngredientJoin = rootRecipe.join("ingredients", JoinType.INNER);
+                predicates.add(builder.and(builder.equal(recipeIngredientJoin.get("name"), ingredient)));
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(recipeFilter.getMentioning())) {
+            for (String mention : recipeFilter.getMentioning()) {
+                predicates.add(builder.like(rootRecipe.get("details"), "%" + mention + "%"));
             }
         }
 
