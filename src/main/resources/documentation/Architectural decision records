@@ -1,16 +1,74 @@
+IDEALS for microservices:
+- Interface segregation : Rest service HTTP connection using json. chose the most readable , lightweight and supported by other clients. Other media types can be added
+- Deployability: microservice easily deployable in a container due to jar packing
+     - to be added for completeness: define custom business metrics we want to monitor
+     - add alerting and monitoring
+     - add tracing : here audit will do but if we want to connect to other APIs we definitely need tracing
+     - sonar, pitest , checkmarks integrations in CI CD pipeline
+     - Dtab configs
+     - service discoverability config : also heartbeat, resilient shutdown and operational mode
+     - blue - green , canary releases
+     - ansible for IaC
+     - API Gateway support : certificates for authentication , access and peer tokens for other apis
+     - logging and audit logging
+- Event driven -> not needed for this level of simplicity. Over-engineering in this case. Useful for integration with third parties that have multiple consumers
+- Availability over consistency : Red Green would impose distributed db so we could go for availability : not making sql my best choice :)
+      We can still use Oracle DataGuard with Fast-Start Failover
+      At db isolation level : could be good also with repeatable reads. Common safe choice is Serializable
+- Loose coupling :
+    - Contract first design :
+         for easier collaboration between teams and also to leverage code gen tools. Contracts are our entry points so should be given the needed attention
+         Open API 3 -> widely accepted standard and adapted to be more inclusive of Links ( complete Restfull services) , Oauth2 and OpenID Connect Discovery ( microservices)
+         OpenAPI 3.1 -> still needs some time to have a mature ecosystem around it
+    - Hypermedia: to help frontends to be more independent of service endpoints. This way UI clients could populate the query options in a dropdown
+    - DB per service
+- Single responsibility :
+    - Domain Bounded Context and Domain Driven API endpoint definitions like it would sound natural
+    - API calls for interaction with the service
+    - publish api specs in a contracts service
+
 Spring Boot to benefit from easy setups and bindings
 
-Use Contract-First approach for easier collaboration between teams and also to leverage code gen tools. Contracts are our entry points so should be given the needed attention
+Coding decisions :
+ - clean code:
+      - Apply SOLID principles, design patterns and refactoring techniques
+      - uncle Bob's top down rule
+            - still pending :
+                - use Strategy pattern for DB filters to respect Open Closed Principle
+      - java 8 : could use 11 or others, yet I'm familiar as a huge majority with 8 and serves the purpose of this API
+      - jpa protocol as persistence layer for maximum portability. Query data at db level.
+      - optional use
+      - Consider using futures for interaction with data layer for a more resilient service
 
-Open API 3 -> widely accepted standard and addapted to be more inclusive of Links ( complete Restfull services) , Oauth2 and OpenID Connect Discovery ( microservices)
-OpenAPI 3.1 -> still needs some time to have a mature ecosystem around it
+  - restfull :
+      - contract-first approach: use code generation from api docs
+      - hyperlinks
+      - graphql for data query : no, not a rest api anymore
+      - swagger or some api docs : openAPI 3.0
+      - object life span for cached get requests
 
-For sake of simplicity we will support only on mediatype, the application/Json. Multiple types could be supported for multiple clients based on needs.
+  - testing :
+      - sonar and code smells : to be checked
+      - pitest for code coverage : to be added
+      - Integration tests simple with spring test and Junit 5 (black box testing)
+      - UTs : to be added (white box testing)
+      - system tests : to be added
 
-JPA3 as persistance layer for maximum portability
-ManyToMany relationship for recipes and ingredients as some ingredients may belong to few recipes and to improve that search performance.
+  - data decisions:
+      - plain old sql db :
+            ManyToMany relationship for recipes and ingredients as some ingredients may belong to few recipes and to improve that search performance.
+      - data validations
+      - isolation level : Repeatable Read just enough
+      - level 2 chaching can be added based on demand
+      - big data db options :
+          - nosql with graph db : not chosen due to complexity and devs not being so familiar with this (maintenance perspective)
+          - newSql with json storage : useful for expansion of data in terms of fields. In terms of maintainability for me it feels like dynamic language vs strong typed one.
+                                       I'm more in favor of strong type as Java since it provides a certain order and reassurance of order.
 
-Postman can be used targeting localhost:8081 for the endpoints described in foodies_api_specification.yaml
+      - data mesh:
+          - data quality : should we monitor for inconsistencies in recipes? Like missing ingredients found in description.
+          - data validation : FKs will do that for us
+
 
 
 

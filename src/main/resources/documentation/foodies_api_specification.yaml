@@ -198,7 +198,7 @@ components:
           example: Vegan
         ingredients:
           type: string
-          example: Vegan
+          example: Avocado
 
     Response:
       type: object
